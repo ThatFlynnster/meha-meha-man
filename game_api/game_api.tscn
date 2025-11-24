@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://fbpoxjktobqc"]
+
+[ext_resource type="Script" uid="uid://b5xk7e5e0ff2t" path="res://game_api/game_api.gd" id="1_awp0e"]
+
+[node name="GameAPI" type="Node"]
+script = ExtResource("1_awp0e")

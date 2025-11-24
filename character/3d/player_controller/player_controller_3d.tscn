@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://dt1st2s8r560m"]
+
+[ext_resource type="Script" uid="uid://dvb6ua8ehhlnp" path="res://character/3d/player_controller/player_controller_3d.gd" id="1_2n6tr"]
+[ext_resource type="Script" uid="uid://dy1ixeaia2sj8" path="res://character/3d/player_controller/player_head_3d.gd" id="2_acyvj"]
+[ext_resource type="PackedScene" uid="uid://drafxbrfvks22" path="res://character/3d/player_controller/player_ui_3d.tscn" id="2_uetwh"]
+
+[node name="PlayerController3D" type="Node3D" node_paths=PackedStringArray("head")]
+script = ExtResource("1_2n6tr")
+head = NodePath("PlayerHead3D")
+
+[node name="PlayerHead3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+top_level = true
+script = ExtResource("2_acyvj")
+
+[node name="Camera3D" type="Camera3D" parent="PlayerHead3D"]
+cull_mask = 1048573
+fov = 70.0
+
+[node name="PlayerUI3D" parent="." instance=ExtResource("2_uetwh")]

@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://yutgp34cf8tp"]
+
+[ext_resource type="Shader" uid="uid://drwaj1q043fj7" path="res://scenes/maps/demo_world/ground_shader.tres" id="1_ctey2"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ctey2")

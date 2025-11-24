@@ -1,0 +1,26 @@
+[gd_resource type="VisualShader" load_steps=4 format=3 uid="uid://drwaj1q043fj7"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_uum1p"]
+output_port_for_preview = 0
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeVectorDecompose" id="VisualShaderNodeVectorDecompose_cyelg"]
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_ta2ct"]
+output_port_for_preview = 0
+operator = 11
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+
+
+"
+nodes/vertex/2/node = SubResource("VisualShaderNodeInput_uum1p")
+nodes/vertex/2/position = Vector2(-1100, 200)
+nodes/vertex/3/node = SubResource("VisualShaderNodeVectorDecompose_cyelg")
+nodes/vertex/3/position = Vector2(-640, 260)
+nodes/vertex/4/node = SubResource("VisualShaderNodeVectorOp_ta2ct")
+nodes/vertex/4/position = Vector2(-280, 240)
+nodes/vertex/connections = PackedInt32Array(2, 0, 3, 0, 3, 0, 4, 0, 3, 1, 4, 1)
