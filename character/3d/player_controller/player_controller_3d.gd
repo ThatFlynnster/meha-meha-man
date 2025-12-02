@@ -9,8 +9,6 @@ extends CharacterController3D
 var _eye_offset := Vector3(0, 1.5, 0)
 var _cam_pitch: float = 0.0
 var _cam_yaw: float = 0.0
-var _time_since_physics : float = 0.0
-var _accumulated_input_dir : Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
@@ -53,18 +51,7 @@ func _update_throttle(throttle: Vector2) -> void:
 
 
 func _process(delta: float) -> void:
-	_time_since_physics += delta
-
-	# --- A. Input Accumulation (Sub-tick Movement) ---
-	# We capture the input *right now* to ensure we don't miss a 
-	# lightning-fast key tap that happened between physics frames.
-	var raw_input = Input.get_vector("left", "right", "forward", "back")
-	var frame_dir = (head.transform.basis * Vector3(raw_input.x, 0, raw_input.y)).normalized()
-
-	# If we have input this frame, overwrite the accumulator.
-	# (Simple version: assumes last input overrides. Complex version: average them)
-	if frame_dir.length() > 0:
-		_accumulated_input_dir = frame_dir
+	pass
 
 
 func _physics_process(delta: float) -> void:
