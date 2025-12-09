@@ -11,7 +11,7 @@ head = NodePath("Interpolater/Camera3D")
 [node name="Interpolater" type="Node3D" parent="." node_paths=PackedStringArray("target")]
 script = ExtResource("2_acyvj")
 target = NodePath("Camera3D")
-offset_pos = Vector3(0, 1.5, 0)
+offset_pos = Vector3(0, 1.5, 6)
 
 [node name="Camera3D" type="Camera3D" parent="Interpolater"]
 physics_interpolation_mode = 2
