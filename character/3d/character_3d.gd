@@ -1,4 +1,11 @@
+class_name Character3D
 extends CharacterBody3D
+
+enum FloorState {
+	AIRBORNE,
+	ON_FLOOR,
+	ON_SLIDE,
+}
 
 @export var controller: CharacterController3D
 const SPEED = 5.5
@@ -9,7 +16,10 @@ const AIR_DECELERATION = 0.0
 const JUMP_VELOCITY = 5.72
 const TERMINAL_VELOCITY = 30.0
 
-@onready var _floor_cast := %FloorShapeCast
+@onready var _floor_cast := %FloorCast
+
+@export var height: float = 2.0
+@export var radius: float = 0.35
 
 var _is_on_floor := false
 var _jump_pending := false
@@ -17,37 +27,55 @@ var _direction := Vector3.ZERO
 var _acceleration
 var _deceleration
 
+var slope_limit: float = 45.0
+
 # Debug variables
 var _debug_spheres: Array[MeshInstance3D] = []
 var _debug_mesh: SphereMesh = SphereMesh.new()
 var _debug_material: StandardMaterial3D = StandardMaterial3D.new()
+var _debug_material_steep: StandardMaterial3D = StandardMaterial3D.new()
+
+
+func _ready() -> void:
+	controller.connect("rotate", _rotate)
+	controller.connect("set_rotation", _set_rotation)
+	controller.connect("direction_updated", _update_direction)
+	controller.connect("jump_requested", _jump)
+	
+	# Configure the visual style of the debug sphere
+	_debug_mesh.radius = 0.05
+	_debug_mesh.height = 0.1
+	_debug_material.albedo_color = Color.GREEN
+	_debug_material_steep.albedo_color = Color.RED
+	_debug_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED # Makes it glow/visible in dark
+	_debug_material_steep.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+
 
 func _check_floor() -> bool:
+	var collision_points = _floor_cast.collision_points
+	var collision_normals = _floor_cast.collision_normals
+	var highest_point = _floor_cast.highest_collision_point
+	var lowest_point = _floor_cast.lowest_collision_point
+	
 	for sphere in _debug_spheres:
 		sphere.queue_free()
 	_debug_spheres.clear()
 	
-	if not _floor_cast.is_colliding(): return false
-	
-	var collision_points = []
-	for i in range(_floor_cast.get_collision_count()):
-		var point = _floor_cast.get_collision_point(i)
-		collision_points.append(point)
-		
+	for i in range(len(collision_points)):
+		var point = collision_points[i]
 		var debug_sphere = MeshInstance3D.new()
 		debug_sphere.mesh = _debug_mesh
 		add_child(debug_sphere)
 		debug_sphere.top_level = true
 		debug_sphere.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 		debug_sphere.global_position = point
+		if collision_normals[i].angle_to(Vector3.UP) < deg_to_rad(slope_limit):
+			_debug_mesh.surface_set_material(0, _debug_material)
+		else:
+			_debug_mesh.surface_set_material(0, _debug_material_steep)
 		_debug_spheres.append(debug_sphere)
 	
-	var highest_collision_point = collision_points[0]
-	for collision_point in collision_points:
-		if collision_point.y > highest_collision_point.y:
-			highest_collision_point = collision_point
-	
-	var collision_point_height = highest_collision_point.y
+	var collision_point_height = highest_point.y
 	if position.y - collision_point_height <= 0.0:
 		return true
 	return false
@@ -76,20 +104,6 @@ func apply_impulse(impulse_velocity: Vector3, cancel_momentum: bool) -> void:
 		velocity = impulse_velocity
 	else:
 		velocity += impulse_velocity
-
-
-func _ready() -> void:
-	controller.connect("rotate", _rotate)
-	controller.connect("set_rotation", _set_rotation)
-	controller.connect("direction_updated", _update_direction)
-	controller.connect("jump_requested", _jump)
-	
-	# Configure the visual style of the debug sphere
-	_debug_mesh.radius = 0.05  # Size of the sphere
-	_debug_mesh.height = 0.1
-	_debug_material.albedo_color = Color.RED
-	_debug_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED # Makes it glow/visible in dark
-	_debug_mesh.surface_set_material(0, _debug_material)
 
 
 func _physics_process(delta: float) -> void:
